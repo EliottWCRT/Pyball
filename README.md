@@ -24,4 +24,4 @@ En tant que joueur je peux :
 En tant que joueur je peux savoir :
 - Ma position x,y
 - Si je suis connecté 
-- 
+- La position de la balle et par qui elle est prise et ou est la personne qui a la balle

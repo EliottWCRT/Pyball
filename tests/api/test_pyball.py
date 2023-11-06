@@ -1,123 +1,76 @@
-import j2l.pytactx.agent as pytactx
-
-agent = pytactx.Agent(
-	playerId="Eliott",
-	arena="creativecda2324",
-	username="demo",
-	password="demo",
-	server="mqtt.jusdeliens.com",
-	verbosity=3)
-
-
-agent.update()
-print(agent.game)
-while True:
-    agent.lookAt((agent.dir+1)%4)
-    agent.update()
+from ...src.api.pyball import PytactXFootballer
 
 
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+ARENA= os.getenv("ARENA")
+SERVER= os.getenv("SERVER")
+PORT= os.getenv("PORT")
+USERNAME= os.getenv("USERNAME")
+PASSWORD = os.getenv("PASSWORD")
 
 
-"""
-yEnnemi, xEnnemi = 0,0
-class State:
-    def __init__(self, agent):
-        self.__agent = <agent
-
-    def enter(self):
-        pass
-    def execute(self):
-        pass
-    def exit(self):
-        pass
-
-class StateMachine:
-    def __init__(self, agent):
-        self.agent = agent
-        self.current_state = None
-
-    def set_state(self, new_state):
-        if self.current_state:
-            self.current_state.exit()
-        self.current_state = new_state
-        self.current_state.enter()
-
-    def update(self):
-        if self.current_state:
-            self.current_state.execute()
-
-class ScanState(State):
-    def enter(self):
-        pass
-
-    def execute(self):
-        if self.agent.distance>0:
-            self.agent.current_state(AttackState(self.agent))
-
-            return
-        
-        x=random.randint (0,39) 
-        y=random.randint (0,29)
-        agent.deplacerVers(x,y)
-        agent.changerCouleur(0,255,0)
-
-    def exit(self):
-        pass
-class AttackState(State):
-    def enter(self):
-        pass
-
-    def execute(self):
-        pass
-        global xEnnemi
-        global yEnnemi
-        if agent.distance==0  and agent.x==xEnnemi and agent.y==yEnnemi:
-            self.agent.current_state(ScanState(self.agent))
-            agent.changerCouleur(255,0,0)
-
-    def exit(self):
-        pass"""
+def createAgent(playerId:str) -> PytactXFootballer :
+   return PytactXFootballer(playerId, "pyball", 1883, "demo","demo","mqtt.jusdeliens.com")
+    
 
 
+def test_instanciation():
+    # Agent test is register as blue team on the server 
+    playerBlue = createAgent ("agentBlue")
+    x,y = playerBlue.getPlayerPostition()
+    assert x >=18
+    assert 4<=y<=12
 
+    # Agent test is register as red team on the server 
+    playerRed = createAgent ("agentRed")
+    x,y = playerRed.getPlayerPostition()
+    assert x <=18
+    assert 4>=y>=12
 
+def test_move():
+    # Agent blue is moving 
+    playerBlue = createAgent ("agentBlue")
+    x,y = playerBlue.getPlayerPostition()
+    playerBlue.move(+1,+1)
+    playerBlue.update()
+    xafter,yafter = playerBlue.getPlayerPostition()
+    assert xafter == x+1
+    assert yafter == y+1
+    
+    # Agent blue is moving 
+    playerRed = createAgent ("agentRed")
+    x,y = playerRed.getPlayerPostition()
+    playerRed.move(-1,+-1)
+    playerRed.update()
+    xafter,yafter = playerRed.getPlayerPostition()
+    assert xafter == x-1
+    assert yafter == y-1
 
+def test_getBallOwner():
+    playerBlue = createAgent ("agentBlue")
+    while playerBlue.getPlayerPostition() !=playerBlue.getBallPosition():
+        xPlayer,yPlayer = playerBlue.getPlayerPostition()
+        xBall,yBall = playerBlue.getBallPosition()
+        playerBlue.move(dx=xBall-xPlayer, 
+                        dy=yBall-yPlayer)
+        playerBlue.update()
+    assert playerBlue.getBallOwner() == "agentBlue"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-while True:
-	agent.update()
-	agent.lookAt((agent.dir + 1) % 4)
+def test_shoot():
+    playerBlue = createAgent ("agentBlue")
+    while  playerBlue.getBallOwner() != "agentBlue":
+        xPlayer,yPlayer = playerBlue.getPlayerPostition()
+        xBall,yBall = playerBlue.getBallPosition()
+        playerBlue.move(dx=xBall-xPlayer, 
+                        dy=yBall-yPlayer)
+        playerBlue.update()
+    playerBlue.shoot(xPlayer+3, yPlayer, 0.1)
+    playerBlue.update()
+    xBall,yBall = playerBlue.getBallPosition()
+    xPlayer,yPlayer = playerBlue.getPlayerPostition()
+    assert xBall > xPlayer and yBall == yPlayer
