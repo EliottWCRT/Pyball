@@ -1,12 +1,14 @@
 import j2l.pytactx.agent as pytactx
 
-agent = pytactx.Agent(
-	playerId="Eliott",
-	arena="creativecda2324",
-	username="demo",
-	password="demo",
-	server="mqtt.jusdeliens.com",
-	verbosity=3)
+class IPyFootballer:
+    def __init__(self) -> None:
+        self
+    def update(self) -> None :
+        """
+        Fetch the last values of robot sensors from server
+        And send buffered requests in one shot to limit bandwidth.
+        To be call in the main loop at least every 10 msecs.
+        """
 
 
 agent.update()

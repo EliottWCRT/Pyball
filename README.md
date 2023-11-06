@@ -20,3 +20,8 @@ En tant que joueur je peux :
 - Deplacer en x ou y relatif 
 - S’orienter vers la direction du deplacment  
 - Passer vers la position x,y de l’allier avec une vitesse random
+
+En tant que joueur je peux savoir :
+- Ma position x,y
+- Si je suis connecté 
+- 
