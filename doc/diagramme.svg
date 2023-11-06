@@ -1,0 +1,52 @@
+@startuml
+actor player
+participant agent.py as agent
+participant Broker
+box Serveur
+participant ServerOnMessage
+participant ServerUpdated
+participant AgentModel
+end box
+player -> agent: pytactX.agent()
+
+
+
+
+
+
+agent -> Broker: Envoie de la requête de la naissance de l'agent avec les identifiants de connexion
+Broker -> Broker: Vérification de l'username du password et l'arene 
+ServerOnMessage <- Broker: Envoie de la requête de la naissance de l'agent 
+ServerOnMessage -> ServerOnMessage: Validation requête de la naissance (Verification du nombre de joueurs)
+ServerOnMessage -> AgentModel: Instanciation de l'agent
+activate AgentModel
+
+
+
+
+
+
+
+
+
+agent -> Broker: Envoie d'une requête de déplacement vers l'avant en x,y
+ServerOnMessage <- Broker: Envoie d'ordres
+ServerOnMessage -> ServerOnMessage: Validation requête de déplacement (Verification si l'agent a l'autorisation de la zone et que la partie a bien commencé)
+ServerOnMessage -> ServerOnMessage: Mise a jour de l'état de l'agent
+Broker --> agent: Renvoi de l'état du robot à jour
+ArenaViewer.py <- agent: Renvoi de l'état du robot à jour
+
+agent -> Broker: Envoie d'une requête de passe en x,y et une vitesse random
+ServerOnMessage <- Broker: Envoie d'ordres
+ServerOnMessage -> ServerOnMessage: Validation requête de passe (Verification si l'agent a le ballon et si la partie a bien commencé)
+ 
+== mainloop ==
+ServeurUpdate --> Broker: Renvoi de l'état du robot à jour
+agent <-- Broker: Renvoi de l'état du robot à jour
+agent -> ArenaViewer.py: Renvoi de l'état du robot à jour
+ServerUpdated -> ServerUpdated: Verifie le temps restant 
+==GameOver==
+ServerUpdated -> AgentModel: Suppression des agents a la fin de la partie
+deactivate AgentModel
+
+@enduml
