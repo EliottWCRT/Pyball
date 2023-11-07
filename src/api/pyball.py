@@ -26,7 +26,8 @@ class IPyFootballer:
         ...
     def getBallOwner (self) -> str:
         """
-        To have the name of the ball owner"""
+        To have the name of the ball owner
+        """
         ...
     
     def getBallPosition (self) -> tuple[int,int]:
@@ -35,5 +36,23 @@ class IPyFootballer:
         ...
  
 class PytactXFootballer (IPyFootballer):
-    def __init__(self, playerId:str or None=None, arena:str or None=None, server:str or None=None) -> None:
+    def __init__(self, playerId:str, arena:str, server:str, port:int, username:str, password:str) -> None:
+        self.__agent=pytactx.Agent(playerId, arena, username, password, server, port)
         ...
+
+    def update(self) -> None :
+        self.__agent.update()
+    def move(self,dx:int,dy:int) -> None:
+        self.__agent.move(dx,dy)
+    def shoot(self, targetX:int, targetY:int, magnitude:float):
+
+        ...
+    def getBallOwner (self) -> str:
+        return ""
+  
+    def getBallPosition (self) -> tuple[int,int]:
+        return (self.__agent.x, self.__agent.y) #todo
+    
+    def getPlayerPostition (self) -> tuple[int,int]:
+        return (self.__agent.x, self.__agent.y)
+        

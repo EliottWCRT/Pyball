@@ -1,5 +1,10 @@
-from ...src.api.pyball import PytactXFootballer
-
+import os
+import sys
+__workdir__ = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+__j2ldir__ = os.path.join(__workdir__, "src", "api")
+sys.path.append(__workdir__)
+sys.path.append(__j2ldir__)
+from src.api.pyball import PytactXFootballer
 
 
 import os
@@ -9,32 +14,32 @@ load_dotenv()
 
 ARENA= os.getenv("ARENA")
 SERVER= os.getenv("SERVER")
-PORT= os.getenv("PORT")
+PORT= int(os.getenv("PORT"))
 USERNAME= os.getenv("USERNAME")
 PASSWORD = os.getenv("PASSWORD")
 
 
+
 def createAgent(playerId:str) -> PytactXFootballer :
-   return PytactXFootballer(playerId, "pyball", 1883, "demo","demo","mqtt.jusdeliens.com")
+   return PytactXFootballer(playerId, ARENA, SERVER, PORT, USERNAME, PASSWORD)
     
+playerBlue = createAgent ("agentBlue")
+playerRed = createAgent ("agentRed")
 
 
 def test_instanciation():
     # Agent test is register as blue team on the server 
-    playerBlue = createAgent ("agentBlue")
     x,y = playerBlue.getPlayerPostition()
     assert x >=18
     assert 4<=y<=12
 
     # Agent test is register as red team on the server 
-    playerRed = createAgent ("agentRed")
     x,y = playerRed.getPlayerPostition()
     assert x <=18
     assert 4>=y>=12
 
 def test_move():
     # Agent blue is moving 
-    playerBlue = createAgent ("agentBlue")
     x,y = playerBlue.getPlayerPostition()
     playerBlue.move(+1,+1)
     playerBlue.update()
@@ -43,16 +48,14 @@ def test_move():
     assert yafter == y+1
     
     # Agent blue is moving 
-    playerRed = createAgent ("agentRed")
     x,y = playerRed.getPlayerPostition()
-    playerRed.move(-1,+-1)
+    playerRed.move(-1,-1)
     playerRed.update()
     xafter,yafter = playerRed.getPlayerPostition()
     assert xafter == x-1
     assert yafter == y-1
 
 def test_getBallOwner():
-    playerBlue = createAgent ("agentBlue")
     while playerBlue.getPlayerPostition() !=playerBlue.getBallPosition():
         xPlayer,yPlayer = playerBlue.getPlayerPostition()
         xBall,yBall = playerBlue.getBallPosition()
@@ -62,7 +65,6 @@ def test_getBallOwner():
     assert playerBlue.getBallOwner() == "agentBlue"
 
 def test_shoot():
-    playerBlue = createAgent ("agentBlue")
     while  playerBlue.getBallOwner() != "agentBlue":
         xPlayer,yPlayer = playerBlue.getPlayerPostition()
         xBall,yBall = playerBlue.getBallPosition()
