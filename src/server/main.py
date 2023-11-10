@@ -31,6 +31,8 @@ def timestampToStr(sec):
 
 def resetStadium():
     """1. Initialiser les règles du jeu"""
+    referee.ruleArena("reset", True)
+    referee.update()
     agents = {
         "DefenseurB": {
             "team":0,
@@ -122,7 +124,9 @@ def resetStadium():
     for agentId, attributes in agents.items():
         for attributeKey, attributeValue, in attributes.items():
             referee.rulePlayer(agentId, attributeKey, attributeValue)
+    time.sleep(1)
     referee.update()
+    time.sleep(5)
     #3 Fermer les portes de l'arène 
 
 resetStadium()
@@ -133,8 +137,10 @@ oldPlayers= {}
 scoreEquipeB=0
 scoreEquipeR=0
 gameOver=False
-timeLimit=1*60
+timeLimit=3*60
 gameStartTime=referee.game["t"]
+totalElapsedTime=0
+
 #4 Boucle principale du jeu
 
 while gameOver==False:
@@ -146,26 +152,27 @@ while gameOver==False:
     players=copy.deepcopy(referee.range)
     ball=players["ball"] 
     xBall, yBall = ball["x"],ball["y"]
-    # 4.2 : Si le temps du jeu est écoulé 
-    elapsedTime=(referee.game["t"]-gameStartTime)/1000
-    gameOver=elapsedTime>=timeLimit
-    referee.ruleArena("info", f" Equipe bleu🔵 {scoreEquipeB} - {scoreEquipeR} 🔴Equipe Rouge  ⏳{timestampToStr(elapsedTime)}")
 
+    elapsedTime=(referee.game["t"]-gameStartTime)/1000
     
     # 4.2 : Si la balle arrive dans un but d'une équipe
     if 0<=xBall<1 and -1<=yBall-stadiumHeight//2<=+1:
-        ...
     # Rajoute +1 au score de l'équipe opposée
         print("équipe rouge a marqué un but")
-        scoreEquipeB+=1
+        scoreEquipeR+=1
+        totalElapsedTime+=elapsedTime
     # Replacer les joueurs et la balle a leurs états initiaux en prennant un certain temps
         resetStadium()
 
     if stadiumWidth-1<=xBall<stadiumWidth and -1<=yBall-stadiumHeight//2<=+1:
-        ...
         print("équipe bleu a marqué un but")
-        scoreEquipeR+=1
+        scoreEquipeB+=1
+        totalElapsedTime+=elapsedTime
         resetStadium()
+
+    # 4.2 : Si le temps du jeu est écoulé 
+    gameOver=elapsedTime+totalElapsedTime>=timeLimit
+    referee.ruleArena("info", f" Equipe bleu🔵 {scoreEquipeB} - {scoreEquipeR} 🔴Equipe Rouge  ⏳{timestampToStr(totalElapsedTime+elapsedTime)}")
 
 # Afficher le commentaire selon le score quand le jeu est terminé
 if scoreEquipeB>scoreEquipeR:
